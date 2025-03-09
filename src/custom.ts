@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
 import { randomString } from "./utils";
 
-interface DBRecipe {
+interface RawRecipe {
   id: number;
   name: string;
   recipe: string;
@@ -9,6 +9,8 @@ interface DBRecipe {
   modified: string;
   adminKey: string;
 }
+
+type DBRecipe = RawRecipe | null;
 
 const db = new Database("custom.db", { create: true, strict: true });
 
@@ -48,9 +50,8 @@ export function deleteRecipeByName(name: string) {
   db.query("DELETE FROM custom WHERE name = $name;").run({ $name: name });
 }
 
-export function updateRecipe(id: number, name: string, recipe: string) {
-  db.query("UPDATE custom SET name = $name, recipe = $recipe, modified = $modified WHERE id = $id;").run({
-    $id: id,
+export function updateRecipeByName(name: string, recipe: string) {
+  db.query("UPDATE custom SET recipe = $recipe, modified = $modified WHERE name = $name;").run({
     $name: name,
     $recipe: recipe,
     $modified: new Date().toISOString(),

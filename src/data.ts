@@ -4,6 +4,7 @@ import {
   RawRecipe,
   RawRecipeItem,
   RawRecipeRow,
+  RawResultWithCount,
   RawShapelessRecipe,
   Recipe,
   RecipeItem,
@@ -84,7 +85,12 @@ for (const version in dataPaths.pc) {
                 inShape: rawRecipe.inShape.map((row) => rawRowtoItem(row, items[version])),
                 outShape: rawRecipe.outShape?.map((row) => rawRowtoItem(row, items[version])),
               }),
-          result: rawItemToItem(rawRecipe.result, items[version]),
+          result: {
+            ...rawItemToItem(rawRecipe.result, items[version]),
+            ...(typeof rawRecipe == "object" && "count" in (rawRecipe.result as RawResultWithCount)
+              ? { count: (rawRecipe.result as RawResultWithCount).count }
+              : {}),
+          },
         });
       } catch (error) {}
     }
