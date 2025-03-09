@@ -2,7 +2,7 @@ import { swagger } from "@elysiajs/swagger";
 import { Elysia, t } from "elysia";
 import { addRecipe, deleteRecipeByName, getRecipeById, getRecipeByName, updateRecipeByName } from "./custom";
 import { recipes } from "./data";
-import { Recipe, TRecipe, TUserRecipe } from "./models";
+import { Recipe, TUserRecipe } from "./models";
 
 const PORT = process.env.PORT || 3000;
 
@@ -17,7 +17,16 @@ const app = new Elysia()
     },
     {
       response: {
-        200: t.Record(t.String({ title: "version" }), t.Record(t.String({ title: "name" }), t.Array(TRecipe))),
+        200: t.Record(
+          t.String({ title: "version" }),
+          t.Record(
+            t.String({ title: "name" }),
+            t.Array(
+              // TRecipe
+              t.Any({ title: "recipe" })
+            )
+          )
+        ),
       },
     }
   )
@@ -50,7 +59,16 @@ const app = new Elysia()
         onlyName: t.Boolean({ default: true }),
       }),
       response: {
-        200: t.Union([t.Record(t.String({ title: "name" }), t.Array(t.Object({}, { title: "recipe" }))), t.Array(t.String({ title: "name" }))]),
+        200: t.Union([
+          t.Record(
+            t.String({ title: "name" }),
+            t.Array(
+              // TRecipe
+              t.Any({ title: "recipe" })
+            )
+          ),
+          t.Array(t.String({ title: "name" })),
+        ]),
         404: t.Literal("Version not found"),
       },
     }
@@ -103,32 +121,36 @@ const app = new Elysia()
       response: {
         200: t.Union([
           t.Array(
-            t.Union([
-              t.Object(
-                {
-                  ingredients: t.Array(t.String({ title: "item" })),
-                  result: t.Object({
-                    item: t.String({ title: "item" }),
-                    count: t.Optional(t.Number({ title: "count" })),
-                  }),
-                },
-                { title: "recipe" }
-              ),
-              t.Object(
-                {
-                  inShape: t.Array(t.Array(t.Optional(t.String({ title: "item_name" })))),
-                  outShape: t.Optional(t.Array(t.Array(t.Optional(t.String({ title: "item_name" }))))),
-                  result: t.Object({
-                    item: t.String({ title: "item_name" }),
-                    count: t.Optional(t.Number({ title: "count" })),
-                  }),
-                },
-                { title: "recipe" }
-              ),
-            ]),
-            { title: "simple" }
+            // t.Union([
+            //   t.Object(
+            //     {
+            //       ingredients: t.Array(t.String({ title: "item" })),
+            //       result: t.Object({
+            //         item: t.String({ title: "item" }),
+            //         count: t.Optional(t.Number({ title: "count" })),
+            //       }),
+            //     },
+            //     { title: "recipe" }
+            //   ),
+            //   t.Object(
+            //     {
+            //       inShape: t.Array(t.Array(t.Optional(t.String({ title: "item_name" })))),
+            //       outShape: t.Optional(t.Array(t.Array(t.Optional(t.String({ title: "item_name" }))))),
+            //       result: t.Object({
+            //         item: t.String({ title: "item_name" }),
+            //         count: t.Optional(t.Number({ title: "count" })),
+            //       }),
+            //     },
+            //     { title: "recipe" }
+            //   ),
+            // ]),
+            // { title: "simple" }
+            t.Any({ title: "recipe" })
           ),
-          t.Array(TRecipe),
+          t.Array(
+            // TRecipe
+            t.Any({ title: "recipe" })
+          ),
         ]),
         404: t.Literal("Recipe not found"),
       },
@@ -185,7 +207,8 @@ const app = new Elysia()
           {
             id: t.Number(),
             name: t.String(),
-            recipe: TUserRecipe,
+            // recipe: TUserRecipe,
+            recipe: t.Any(),
             created: t.String(),
             modified: t.String(),
           },
