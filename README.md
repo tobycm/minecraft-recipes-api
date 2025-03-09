@@ -17,6 +17,10 @@ Supports:
 bun i
 ```
 
+```bash {"id":"01JNWEDM83VDHNZE8W5YFFGJVD"}
+git submodule update --init --recursive
+```
+
 ## Development
 
 To start the development server run:
