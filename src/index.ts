@@ -4,6 +4,8 @@ import { addRecipe, deleteRecipeByName, getRecipeById, getRecipeByName, updateRe
 import { recipes } from "./data";
 import { Recipe, TRecipe, TUserRecipe } from "./models";
 
+const PORT = process.env.PORT || 3000;
+
 const app = new Elysia()
   .use(swagger())
   .get("/", () => "Hello Elysia")
@@ -285,6 +287,6 @@ const app = new Elysia()
       },
     }
   )
-  .listen(3000);
+  .listen(PORT);
 
 console.log(`🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`);
