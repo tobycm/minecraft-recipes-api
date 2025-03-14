@@ -24,21 +24,21 @@ export const TKey = t.String({ minLength: 16, maxLength: 16 });
 export function addRecipe(name: string, recipe: string): string {
   const key = randomString(16);
   db.query("INSERT INTO custom (name, recipe, created, modified, adminKey) VALUES ($name, $recipe, $created, $modified, $adminKey);").all({
-    $name: name,
-    $recipe: recipe,
-    $created: new Date().toISOString(),
-    $modified: new Date().toISOString(),
-    $adminKey: key,
+    name,
+    recipe,
+    created: new Date().toISOString(),
+    modified: new Date().toISOString(),
+    adminKey: key,
   });
   return key;
 }
 
 export function getRecipeById(id: number) {
-  return db.query("SELECT * FROM custom WHERE id = $id;").get({ $id: id }) as DBRecipe;
+  return db.query("SELECT * FROM custom WHERE id = $id;").get({ id }) as DBRecipe;
 }
 
 export function getRecipeByName(name: string) {
-  return db.query("SELECT * FROM custom WHERE name = $name;").get({ $name: name }) as DBRecipe;
+  return db.query("SELECT * FROM custom WHERE name = $name;").get({ name }) as DBRecipe;
 }
 
 export function getAllRecipes() {
@@ -46,17 +46,17 @@ export function getAllRecipes() {
 }
 
 export function deleteRecipeById(id: number) {
-  db.query("DELETE FROM custom WHERE id = $id;").run({ $id: id });
+  db.query("DELETE FROM custom WHERE id = $id;").run({ id });
 }
 
 export function deleteRecipeByName(name: string) {
-  db.query("DELETE FROM custom WHERE name = $name;").run({ $name: name });
+  db.query("DELETE FROM custom WHERE name = $name;").run({ name });
 }
 
 export function updateRecipeByName(name: string, recipe: string) {
   db.query("UPDATE custom SET recipe = $recipe, modified = $modified WHERE name = $name;").run({
-    $name: name,
-    $recipe: recipe,
-    $modified: new Date().toISOString(),
+    name,
+    recipe,
+    modified: new Date().toISOString(),
   });
 }
