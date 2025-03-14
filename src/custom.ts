@@ -1,4 +1,5 @@
 import { Database } from "bun:sqlite";
+import { t } from "elysia";
 import { randomString } from "./utils";
 
 interface RawRecipe {
@@ -17,6 +18,8 @@ const db = new Database("custom.db", { create: true, strict: true });
 db.query(
   "CREATE TABLE IF NOT EXISTS custom (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, recipe TEXT, created DATE, modified DATE, adminKey TEXT);"
 ).run();
+
+export const TKey = t.String({ minLength: 16, maxLength: 16 });
 
 export function addRecipe(name: string, recipe: string): string {
   const key = randomString(16);

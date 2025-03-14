@@ -1,5 +1,9 @@
 import { t } from "elysia";
 
+export const TItemName = t.String({ minLength: 1, maxLength: 100, pattern: "^[a-z_]+$" });
+
+export const TVersionName = t.String({ minLength: 1, maxLength: 25 });
+
 type FolderPath = string;
 
 export interface DataPaths {
@@ -28,7 +32,7 @@ export interface Item {
 export const TItem = t.Object(
   {
     id: t.Number(),
-    name: t.String(),
+    name: TItemName,
     displayName: t.String(),
     stackSize: t.Number(),
   },
@@ -107,30 +111,33 @@ export type Recipe = ShapedRecipe | ShapelessRecipe;
 
 export const TRecipe = t.Union([TShapedRecipe, TShapelessRecipe], { title: "Recipe" });
 
+export const TUserShape = t.Array(
+  t.Array(
+    t.Union([
+      t.Object({
+        item: t.String(),
+        metadata: t.Number({ default: 0 }),
+        count: t.Number({ default: 1 }),
+      }),
+      TItemName,
+      t.Null(),
+    ]),
+    { minItems: 1, maxItems: 3 }
+  ),
+  { minItems: 1, maxItems: 3 }
+);
+
 export const TUserRecipe = t.Object({
   recipe: t.Object({
-    result: t.Object({
-      item: t.String(),
-      metadata: t.Number({ default: 0 }),
-      count: t.Number({ default: 1 }),
-    }),
-    inShape: t.Array(
-      t.Array(
-        t.Object({
-          item: t.String(),
-          metadata: t.Number({ default: 0 }),
-          count: t.Number({ default: 1 }),
-        })
-      )
-    ),
-    outShape: t.Array(
-      t.Array(
-        t.Object({
-          item: t.String(),
-          metadata: t.Number({ default: 0 }),
-          count: t.Number({ default: 1 }),
-        })
-      )
-    ),
+    result: t.Union([
+      t.Object({
+        item: TItemName,
+        metadata: t.Optional(t.Number({ default: 0 })),
+        count: t.Optional(t.Number({ default: 1 })),
+      }),
+      TItemName,
+    ]),
+    inShape: TUserShape,
+    outShape: t.Optional(TUserShape),
   }),
 });

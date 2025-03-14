@@ -1,8 +1,8 @@
 import { swagger } from "@elysiajs/swagger";
 import { Elysia, t } from "elysia";
-import { addRecipe, deleteRecipeByName, getRecipeById, getRecipeByName, updateRecipeByName } from "./custom";
+import { addRecipe, deleteRecipeByName, getRecipeById, getRecipeByName, TKey, updateRecipeByName } from "./custom";
 import { recipes } from "./data";
-import { Recipe, TUserRecipe } from "./models";
+import { Recipe, TItemName, TUserRecipe, TVersionName } from "./models";
 
 const PORT = process.env.PORT || 3000;
 
@@ -112,8 +112,8 @@ const app = new Elysia()
     },
     {
       params: t.Object({
-        version: t.String(),
-        name: t.String({ minLength: 1, maxLength: 100, pattern: "^[a-z_]+$" }),
+        version: TVersionName,
+        name: TItemName,
       }),
       query: t.Object({
         simple: t.Boolean({ default: true }),
@@ -186,7 +186,7 @@ const app = new Elysia()
   .get(
     "/custom/:idOrName",
     ({ params: { idOrName }, error }) => {
-      const dbRecipe = isNaN(Number(idOrName)) ? getRecipeByName(idOrName) : getRecipeById(Number(idOrName));
+      const dbRecipe = idOrName.match(/^(?:\d+)$/) ? getRecipeById(Number(idOrName)) : getRecipeByName(idOrName);
 
       if (!dbRecipe) return error(404, "Recipe not found");
 
@@ -206,7 +206,7 @@ const app = new Elysia()
         200: t.Object(
           {
             id: t.Number(),
-            name: t.String(),
+            name: TItemName,
             // recipe: TUserRecipe,
             recipe: t.Any(),
             created: t.String(),
@@ -233,14 +233,10 @@ const app = new Elysia()
       return { key };
     },
     {
-      params: t.Object({
-        name: t.String({ minLength: 1, maxLength: 100, pattern: "^[a-z_]+$" }),
-      }),
+      params: t.Object({ name: TItemName }),
       body: TUserRecipe,
       response: {
-        200: t.Object({
-          key: t.String(),
-        }),
+        200: t.Object({ key: TKey }),
         400: t.Union([t.Literal("Recipe is required"), t.Literal("Recipe already exists")]),
       },
     }
@@ -261,17 +257,11 @@ const app = new Elysia()
       return { success: true };
     },
     {
-      params: t.Object({
-        name: t.String({ minLength: 1, maxLength: 100, pattern: "^[a-z_]+$" }),
-      }),
-      query: t.Object({
-        key: t.String(),
-      }),
+      params: t.Object({ name: TItemName }),
+      query: t.Object({ key: TKey }),
       body: TUserRecipe,
       response: {
-        200: t.Object({
-          success: t.Boolean(),
-        }),
+        200: t.Object({ success: t.Boolean() }),
         400: t.Union([t.Literal("Recipe is required"), t.Literal("Update key is required")]),
         404: t.Literal("Recipe not found"),
         403: t.Literal("Invalid key"),
@@ -294,16 +284,12 @@ const app = new Elysia()
     },
     {
       params: t.Object({
-        version: t.String(),
-        name: t.String({ minLength: 1, maxLength: 100, pattern: "^[a-z_]+$" }),
+        version: TVersionName,
+        name: TItemName,
       }),
-      query: t.Object({
-        key: t.String(),
-      }),
+      query: t.Object({ key: TKey }),
       response: {
-        200: t.Object({
-          success: t.Boolean(),
-        }),
+        200: t.Object({ success: t.Boolean() }),
         400: t.Literal("Delete key is required"),
         404: t.Literal("Recipe not found"),
         403: t.Literal("Invalid key"),
