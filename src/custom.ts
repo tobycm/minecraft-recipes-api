@@ -16,7 +16,7 @@ const db = new Database("custom.db", { create: true, strict: true });
 
 db.query(
   "CREATE TABLE IF NOT EXISTS custom (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, recipe TEXT, created DATE, modified DATE, adminKey TEXT);"
-);
+).run();
 
 export function addRecipe(name: string, recipe: string): string {
   const key = randomString(16);
